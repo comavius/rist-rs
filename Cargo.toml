@@ -9,3 +9,6 @@ edition = "2024"
 [workspace.dependencies]
 bindgen = "0.72.1"
 tempfile = "3.27.0"
+
+rist-rs  = { path = "crates/rist-rs" }
+rist-rs-sys = { path = "crates/rist-rs-sys" }
