@@ -1,0 +1,25 @@
+excludes = [
+    "*.lock",
+    "*.patch",
+    "package-lock.json",
+    "go.mod",
+    "go.sum",
+    ".gitattributes",
+    ".gitignore",
+    ".gitmodules",
+    ".hgignore",
+    ".svnignore",
+    "LICENSE",
+]
+
+[formatter.nixfmt]
+command = "/nix/store/7ps5j106c8a61imxfx85kcflmvbc344s-nixfmt-1.2.0/bin/nixfmt"
+excludes = []
+includes = ["*.nix"]
+options = []
+
+[formatter.rustfmt]
+command = "/nix/store/lkqd4xixg9lbgch49vb6kc0kr7m1p6cd-rust-minimal-1.95.0/bin/rustfmt"
+excludes = []
+includes = ["*.rs"]
+options = ["--config", "skip_children=true", "--edition", "2024"]
