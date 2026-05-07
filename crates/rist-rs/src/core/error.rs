@@ -1,5 +1,3 @@
-use crate::*;
-
 #[derive(Debug, Clone)]
 pub struct UnknownEnumVariantError {
     pub message: &'static str,

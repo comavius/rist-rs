@@ -1,7 +1,7 @@
 use super::*;
 
-/// `RistLoggingSettingsBuilder` is a builder for creating `RistLoggingSettings` instances,
-/// which wrap `rist_logging_settings`.
+/// [`LoggingSettingsBuilder`] is a builder for creating [`LoggingSettings`] instances,
+/// which wrap [`rist_rs_sys::rist_logging_settings`].
 #[derive(Clone, Default)]
 pub struct LoggingSettingsBuilder<CBLogger = StderrCallBackLogger>
 where
@@ -11,11 +11,11 @@ where
     pub logger: LoggerBuilder<CBLogger>,
 }
 
-/// `RistLoggingSettings` is a wrapper for `rist_logging_settings`.
+/// [`LoggingSettings`] is a wrapper for [`rist_rs_sys::rist_logging_settings`].
 ///
 /// ### Safety(Internal)
-/// Every wrapper types depending on the returned value of `RistLoggingSettings::as_mut_ptr`
-/// must own the `RistLoggingSettings` instance. Otherwise, `rist_logging_settings` and/or
+/// Every wrapper types depending on the returned value of [`LoggingSettings::as_mut_ptr`]
+/// must own the [`LoggingSettings`] instance. Otherwise, [`rist_rs_sys::rist_logging_settings`] and/or
 /// its logger may be invalidated.
 pub struct LoggingSettings<CBLogger = StderrCallBackLogger>
 where
@@ -29,10 +29,10 @@ impl<CBLogger> LoggingSettings<CBLogger>
 where
     CBLogger: CallBackLogger,
 {
-    /// Returns a mutable pointer to the `rist_logging_settings` instance.
+    /// Returns a mutable pointer to the [`rist_rs_sys::rist_logging_settings`] instance.
     ///
     /// # Safety
-    /// The returned pointer is only valid for the lifetime of the `RistLoggingSettings` instance.
+    /// The returned pointer is only valid for the lifetime of the [`LoggingSettings`] instance.
     pub(crate) unsafe fn as_mut_ptr(&mut self) -> *mut rist_rs_sys::rist_logging_settings {
         unsafe {
             &mut std::pin::Pin::as_mut(&mut self.pinned)

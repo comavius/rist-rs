@@ -1,6 +1,6 @@
 use super::*;
 
-/// A builder for creating `Logger` instances.
+/// A builder for creating [`Logger`] instances.
 ///
 /// TODO: `log_stream` and `log_socket` mode is not supported for now.
 #[derive(Default)]
@@ -59,7 +59,7 @@ where
     }
 }
 
-/// `Logger` is a wrapper for managing logging functionality.
+/// [`Logger`] is a wrapper for managing logging functionality.
 ///
 /// ### Safety(Internal)
 /// Drop of this instance means that logger is no longer available.
@@ -91,7 +91,7 @@ where
     /// Returns a mutable pointer to the log callback argument.
     ///
     /// # Safety
-    /// The returned pointer must not be used after the `Logger` instance is dropped.
+    /// The returned pointer must not be used after the [`Logger`] instance is dropped.
     pub(crate) unsafe fn as_log_cb_arg(&self) -> *mut std::os::raw::c_void {
         self.log_cb_arg.unwrap_or(std::ptr::null_mut()) as *mut std::os::raw::c_void
     }
@@ -105,45 +105,38 @@ where
     }
 }
 
-/// When user-defined callback returns `RistCallBackLoggerUserCBFailedError`,
+/// When user-defined callback returns [`CallBackLoggerUserCBFailedError`],
 /// callback of the internal C library will be returned non-zero integer.
 #[derive(Debug, Clone)]
-pub struct RistCallBackLoggerUserCBFailedError {}
+pub struct CallBackLoggerUserCBFailedError {}
 
-/// `RistCallBackLogger` represents both `log_cb` and `log_cb_arg`.
+/// [`CallBackLogger`] represents both `log_cb` and `log_cb_arg`.
 pub trait CallBackLogger: Send + Sync {
     /// `call` will be called when the C library needs to log a message
     /// and a pair of log level and message is available properly.
-    fn call(
-        &self,
-        log_level: &LogLebel,
-        msg: &str,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError>;
+    fn call(&self, log_level: &LogLebel, msg: &str) -> Result<(), CallBackLoggerUserCBFailedError>;
 
     /// Called when the wrapper library detects some malformed behaviour of the C library.
     fn call_malformed(
         &self,
         error: CallBackLoggerError,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    ) -> Result<(), CallBackLoggerUserCBFailedError> {
         self.call(
             &LogLebel::Error,
-            &format!(
-                "rust-wrapper: RistCallBackLogger::call_malformed: {:?}",
-                error
-            ),
+            &format!("rust-wrapper: CallBackLogger::call_malformed: {:?}", error),
         )?;
-        Err(RistCallBackLoggerUserCBFailedError {})
+        Err(CallBackLoggerUserCBFailedError {})
     }
 
-    /// Called when the wrapper library failed to acquire the pointer of `RistCallBackLogger` instance.
+    /// Called when the wrapper library failed to acquire the pointer of [`CallBackLogger`] instance.
     fn call_malformed_global(
         error: CallBackLoggerError,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    ) -> Result<(), CallBackLoggerUserCBFailedError> {
         println!(
-            "rust-wrapper: RistCallBackLogger::call_malformed_global: {:?}",
+            "rust-wrapper: CallBackLogger::call_malformed_global: {:?}",
             error
         );
-        Err(RistCallBackLoggerUserCBFailedError {})
+        Err(CallBackLoggerUserCBFailedError {})
     }
 }
 
@@ -204,28 +197,28 @@ pub(crate) trait CallBackLoggerInternal: CallBackLogger {
         &self,
         log_level: &LogLebel,
         msg: &str,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    ) -> Result<(), CallBackLoggerUserCBFailedError> {
         std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| self.call(log_level, msg)))
-            .map_err(|_| RistCallBackLoggerUserCBFailedError {})
+            .map_err(|_| CallBackLoggerUserCBFailedError {})
             .flatten()
     }
 
     fn panic_free_call_malformed(
         &self,
         error: CallBackLoggerError,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    ) -> Result<(), CallBackLoggerUserCBFailedError> {
         std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| self.call_malformed(error)))
-            .map_err(|_| RistCallBackLoggerUserCBFailedError {})
+            .map_err(|_| CallBackLoggerUserCBFailedError {})
             .flatten()
     }
 
     fn panic_free_call_malformed_global(
         error: CallBackLoggerError,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    ) -> Result<(), CallBackLoggerUserCBFailedError> {
         std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
             Self::call_malformed_global(error)
         }))
-        .map_err(|_| RistCallBackLoggerUserCBFailedError {})
+        .map_err(|_| CallBackLoggerUserCBFailedError {})
         .flatten()
     }
 }
@@ -237,11 +230,7 @@ pub struct StderrCallBackLogger {
 }
 
 impl CallBackLogger for StderrCallBackLogger {
-    fn call(
-        &self,
-        log_level: &LogLebel,
-        msg: &str,
-    ) -> Result<(), RistCallBackLoggerUserCBFailedError> {
+    fn call(&self, log_level: &LogLebel, msg: &str) -> Result<(), CallBackLoggerUserCBFailedError> {
         if self.log_level.is_important_than_or_equal_to(log_level) {
             eprintln!("[{}] {}", log_level, msg);
         }
