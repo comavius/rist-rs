@@ -122,7 +122,7 @@
 //! ### `sender.h`
 //! | C API | Rust API |
 //! | - | - |
-//! | `rist_flow_id_create` | |
+//! | `rist_flow_id_create` | [`rist_create_flow_id`] |
 //! | `rist_sender_create` | [`RistCtx::sender_create`] |
 //! | `rist_sender_npd_get` | [`RistCtx::sender_get_npd`] |
 //! | `rist_sender_npd_enable` | [`RistCtx::sender_enable_npd`] |
