@@ -10,5 +10,7 @@ edition = "2024"
 bindgen = "0.72.1"
 tempfile = "3.27.0"
 
-rist-rs  = { path = "crates/rist-rs" }
-rist-rs-sys = { path = "crates/rist-rs-sys" }
+librist-rs  = { path = "crates/librist-rs" }
+librist-sys = { path = "crates/librist-sys" }
+rist-rs = { path = "crates/rist-rs" }
+rand = "0.10.1"

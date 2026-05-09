@@ -1,0 +1,8 @@
+[package]
+name = "librist-rs"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+librist-sys.workspace = true
+rand.workspace = true

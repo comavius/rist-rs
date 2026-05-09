@@ -1,0 +1,8 @@
+[package]
+name = "librist-sys"
+version.workspace = true
+edition.workspace = true
+
+[build-dependencies]
+bindgen.workspace = true
+tempfile.workspace = true
