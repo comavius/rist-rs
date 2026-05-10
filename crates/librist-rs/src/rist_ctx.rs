@@ -7,7 +7,11 @@ pub struct RistCtx<'a> {
         Option<Box<dyn ReceiverSessionTimeoutCallbackHandler + 'a>>,
     receiver_data_notify_fd: Option<std::os::fd::BorrowedFd<'a>>,
     librist_rs_ctx_id: u128,
-    rist_peers: utility::FastIntDictionary<(std::ptr::NonNull<librist_sys::rist_peer>, u128)>,
+    rist_peers: utility::FastIntDictionary<(
+        std::ptr::NonNull<librist_sys::rist_peer>,
+        RistPeerConfig,
+        u128,
+    )>,
 }
 
 impl<'a> RistCtx<'a> {
@@ -299,9 +303,10 @@ impl<'a> RistCtx<'a> {
 
     /// [`librist_sys::rist_peer_create`]
     pub fn peer_create(&mut self, config: &RistPeerConfig) -> Result<RistPeer, CommonError> {
-        let config = config.as_ptr();
+        let config_ptr = config.as_ptr();
         let mut peer = std::ptr::null_mut();
-        let code = unsafe { librist_sys::rist_peer_create(self.as_mut_ptr(), &mut peer, config) };
+        let code =
+            unsafe { librist_sys::rist_peer_create(self.as_mut_ptr(), &mut peer, config_ptr) };
         if code != 0 {
             return Err(CommonError::CallFailed {
                 function: "rist_peer_create",
@@ -311,7 +316,9 @@ impl<'a> RistCtx<'a> {
         match std::ptr::NonNull::new(peer) {
             Some(peer) => {
                 let librist_rs_peer_id = rand::random();
-                let key = self.rist_peers.insert((peer, librist_rs_peer_id));
+                let key = self
+                    .rist_peers
+                    .insert((peer, config.clone(), librist_rs_peer_id));
 
                 Ok(RistPeer {
                     librist_rs_ctx_id: self.librist_rs_ctx_id,
@@ -330,7 +337,7 @@ impl<'a> RistCtx<'a> {
         &self,
         peer: &RistPeer,
     ) -> Option<std::ptr::NonNull<librist_sys::rist_peer>> {
-        let (ptr, id) = self.rist_peers.get(peer.librist_rs_peer_key)?;
+        let (ptr, _, id) = self.rist_peers.get(peer.librist_rs_peer_key)?;
         if peer.librist_rs_peer_id == *id {
             Some(*ptr)
         } else {
