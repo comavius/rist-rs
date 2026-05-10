@@ -86,9 +86,9 @@
 //! | `rist_peer_config` | [`PeerConfig`], [`RistPeerConfig`] |
 //! | `rist_peer_config_defaults_set` | [`PeerConfig::default`] |
 //! | `rist_parse_address` | (RIST_DEPRECATED) |
-//! | `rist_parse_address2` | |
+//! | `rist_parse_address2` | [`RistPeerConfig::parse_address2`] |
 //! | `rist_peer_config_free` | (RIST_DEPRECATED) |
-//! | `rist_peer_config_free2` | |
+//! | `rist_peer_config_free2` | Not supported (Rust takes care of memory management) |
 //! | `rist_peer_create` | [`RistCtx::peer_create`] |
 //! | `rist_peer_destroy` | [`RistCtx::peer_destroy`] |
 //! | `rist_peer_weight_set` | [`RistCtx::peer_set_weight`] |
@@ -203,6 +203,17 @@ pub enum CommonError {
         function: &'static str,
         value_type: &'static str,
     },
+}
+pub enum ParseAddressError {
+    CallFailed {
+        function: &'static str,
+        code: i32,
+    },
+    NullPointer {
+        function: &'static str,
+        value_type: &'static str,
+    },
+    NulString(std::ffi::NulError),
 }
 pub enum PeerOperationError {
     CallFailed { function: &'static str, code: i32 },

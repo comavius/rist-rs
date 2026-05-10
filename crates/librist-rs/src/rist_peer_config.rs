@@ -125,10 +125,41 @@ fn to_c_buf<const N: usize>(s: &str) -> Result<[std::os::raw::c_char; N], std::f
     Ok(buf)
 }
 
+#[derive(Debug, Clone)]
 pub struct RistPeerConfig {
     pinned: std::pin::Pin<Box<RistPeerConfigPinned>>,
 }
 
+impl RistPeerConfig {
+    /// [`librist_sys::rist_parse_address2`]
+    ///
+    /// [`librist_sys::rist_parse_address`] is deprecated.
+    pub fn parse_address2(&mut self, address: &str) -> Result<&mut Self, ParseAddressError> {
+        let mut raw_ptr = self.as_mut_ptr();
+        let c_str = std::ffi::CString::new(address).map_err(ParseAddressError::NulString)?;
+        let code = unsafe { librist_sys::rist_parse_address2(c_str.as_ptr(), &mut raw_ptr) };
+        if code != 0 {
+            return Err(ParseAddressError::CallFailed {
+                function: "rist_parse_address2",
+                code,
+            });
+        }
+        match std::ptr::NonNull::new(raw_ptr) {
+            None => {
+                return Err(ParseAddressError::NullPointer {
+                    function: "rist_parse_address2",
+                    value_type: "rist_peer_config",
+                });
+            }
+            Some(ptr) => {
+                unsafe { *self.as_mut_ptr() = *ptr.as_ref() };
+            }
+        }
+        Ok(self)
+    }
+}
+
+#[derive(Debug, Clone)]
 struct RistPeerConfigPinned {
     raw: librist_sys::rist_peer_config,
     _pin: std::marker::PhantomPinned,
