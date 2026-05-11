@@ -10,6 +10,14 @@ pub enum LogLevel {
     Simulate,
 }
 
+/// Default value of rist_log_level is Disable.
+/// See: `LOGGING_SETTINGS_INITIALIZER` in logging.h
+impl Default for LogLevel {
+    fn default() -> Self {
+        LogLevel::Disable
+    }
+}
+
 pub struct RistLogLevel(pub(crate) librist_sys::rist_log_level);
 
 impl Into<RistLogLevel> for LogLevel {
