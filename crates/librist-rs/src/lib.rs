@@ -163,6 +163,7 @@
 //! | `rist_sender_data_fd_set` | |
 //! | `rist_receiver_data_fd_set` | |
 //! | `rist_data_fd_stats_get` | |
+pub mod log_callback_handler;
 pub mod receiver_data_callback_handler2;
 pub mod receiver_session_timeout_callback_handler;
 pub mod rist_congestion_control_mode;
@@ -180,6 +181,7 @@ pub mod rist_timing_mode;
 mod utility;
 
 pub use librist_sys;
+pub use log_callback_handler::*;
 pub use receiver_data_callback_handler2::*;
 pub use receiver_session_timeout_callback_handler::*;
 pub use rist_congestion_control_mode::*;
@@ -232,6 +234,8 @@ pub struct UnknownEnumError {
     enum_type: &'static str,
     value: i32,
 }
+
+pub struct CallbackFailedError {}
 
 pub use librist_sys::git_version::LIBRIST_GIT_COMMIT;
 

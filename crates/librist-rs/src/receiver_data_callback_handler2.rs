@@ -1,13 +1,8 @@
 pub use super::*;
 
 pub trait ReceiverDataCallbackHandler2: Send + Sync {
-    fn handle(
-        &self,
-        data_block: &mut RistDataBlock,
-    ) -> Result<(), ReceiverDataCallBackHandleError2>;
+    fn handle(&self, data_block: &mut RistDataBlock) -> Result<(), CallbackFailedError>;
 }
-
-pub struct ReceiverDataCallBackHandleError2 {}
 
 pub(crate) trait ReceiverDataCallbackRawHandler2: ReceiverDataCallbackHandler2 {
     unsafe extern "C" fn handle_raw(

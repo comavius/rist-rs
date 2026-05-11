@@ -1,5 +1,11 @@
 use super::*;
 
+pub struct LoggingSettings {
+    pub log_level: LogLevel,
+    pub log_socket: Option<std::net::UdpSocket>,
+    pub log_stream: Option<std::os::fd::OwnedFd>,
+}
+
 /// Rust wrapper allocates and manages the lifecycle of a [`librist_sys::rist_logging_settings`]
 /// because [`librist_sys::rist_logging_set`] has complex side effect.
 pub struct RistLoggingSettings {

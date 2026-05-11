@@ -1,10 +1,8 @@
 pub use super::*;
 
 pub trait ReceiverSessionTimeoutCallbackHandler: Send + Sync {
-    fn handle(&self, flow_id: u32) -> Result<(), ReceiverDataCallBackHandleError2>;
+    fn handle(&self, flow_id: u32) -> Result<(), CallbackFailedError>;
 }
-
-pub struct ReceiverDataCallBackHandleError2 {}
 
 pub(crate) trait ReceiverSessionTimeoutCallbackRawHandler:
     ReceiverSessionTimeoutCallbackHandler
