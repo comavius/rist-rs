@@ -1,13 +1,16 @@
 use super::*;
 
+#[derive(Default)]
 pub struct LoggingSettings<CBHandler: LogCallbackHandler> {
     pub log_level: LogLevel,
     pub log_handler: LogHandler<CBHandler>,
 }
 
+#[derive(Default)]
 pub enum LogHandler<CBHandler: LogCallbackHandler> {
     CallbackHandler(CBHandler),
     SocketAndStream((Option<std::net::UdpSocket>, Option<std::os::fd::OwnedFd>)),
+    #[default]
     NoHandler,
 }
 
