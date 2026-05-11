@@ -49,7 +49,6 @@
 //! | C API | Rust API |
 //! | - | - |
 //! | `rist_log_level` | |
-//! | `rist_log_set_callback` | |
 //! | `LOGGING_SETTINGS_INITIALIZER` | |
 //! | `rist_logging_settings` | [`RistLoggingSettings`] |
 //! | `rist_log` | |
