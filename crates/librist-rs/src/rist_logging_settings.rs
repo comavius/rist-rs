@@ -16,9 +16,9 @@ pub enum LogHandler<CBHandler: LogCallbackHandler> {
 
 /// Rust wrapper allocates and manages the lifecycle of a [`librist_sys::rist_logging_settings`]
 /// because [`librist_sys::rist_logging_set`] has complex side effect.
-pub struct RistLoggingSettings {
+pub struct RistLoggingSettings<'a> {
     pinned: std::pin::Pin<Box<RistLoggingSettingsPinned>>,
-    _callback_handler: Option<utility::TypeErasedBox>,
+    _callback_handler: Option<utility::TypeErasedBox<'a>>,
     _log_stream_cfile: Option<CFile>,
 }
 
@@ -53,8 +53,10 @@ struct RistLoggingSettingsPinned {
     _pin: std::marker::PhantomPinned,
 }
 
-impl<CBHandler: LogCallbackHandler> Into<RistLoggingSettings> for LoggingSettings<CBHandler> {
-    fn into(self) -> RistLoggingSettings {
+impl<'a, CBHandler: LogCallbackHandler + 'a> Into<RistLoggingSettings<'a>>
+    for LoggingSettings<CBHandler>
+{
+    fn into(self) -> RistLoggingSettings<'a> {
         let log_level = <LogLevel as Into<RistLogLevel>>::into(self.log_level).0;
         let (log_cb, callback_handler, log_cb_arg, log_socket, log_stream, log_stream_cfile) =
             match self.log_handler {
@@ -65,8 +67,8 @@ impl<CBHandler: LogCallbackHandler> Into<RistLoggingSettings> for LoggingSetting
                             arg1: librist_sys::rist_log_level,
                             msg: *const ::std::os::raw::c_char,
                         ) -> ::std::os::raw::c_int;
-                    let mut callback_handler = utility::TypeErasedBox::new(handler);
-                    let log_cb_arg = callback_handler.as_mut_ptr();
+                    let callback_handler = utility::TypeErasedBox::new(handler);
+                    let log_cb_arg = callback_handler.as_ptr();
                     (
                         Some(log_cb),
                         Some(callback_handler),
@@ -102,7 +104,7 @@ impl<CBHandler: LogCallbackHandler> Into<RistLoggingSettings> for LoggingSetting
     }
 }
 
-impl StatefulWrapper<librist_sys::rist_logging_settings> for RistLoggingSettings {
+impl<'a> StatefulWrapper<librist_sys::rist_logging_settings> for RistLoggingSettings<'a> {
     fn as_ptr(&self) -> *const librist_sys::rist_logging_settings {
         &self.pinned.as_ref().get_ref().raw
     }
