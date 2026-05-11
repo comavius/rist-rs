@@ -14,3 +14,4 @@ librist-rs  = { path = "crates/librist-rs" }
 librist-sys = { path = "crates/librist-sys" }
 rist-rs = { path = "crates/rist-rs" }
 rand = "0.10.1"
+libc = "0.2"

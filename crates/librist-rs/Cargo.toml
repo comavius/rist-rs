@@ -6,3 +6,4 @@ edition.workspace = true
 [dependencies]
 librist-sys.workspace = true
 rand.workspace = true
+libc.workspace = true
