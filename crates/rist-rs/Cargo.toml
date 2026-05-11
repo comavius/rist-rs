@@ -4,4 +4,4 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
-rist-rs-sys.workspace = true
+librist-sys.workspace = true
