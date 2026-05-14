@@ -48,15 +48,15 @@
 //! ### `logging.h`
 //! | C API | Rust API |
 //! | - | - |
-//! | `rist_log_level` | |
-//! | `LOGGING_SETTINGS_INITIALIZER` | |
-//! | `rist_logging_settings` | [`RistLoggingSettings`] |
-//! | `rist_log` | |
+//! | `rist_log_level` | [`LogLevel`], [`RistLogLevel`] |
+//! | `LOGGING_SETTINGS_INITIALIZER` | [`LoggingSettings::default`] |
+//! | `rist_logging_settings` | [`LoggingSettings`], [`RistLoggingSettings`] |
+//! | `rist_log` | (Intentionally not supported) |
 //! | `rist_logging_set` | (Intentionally not supported) |
-//! | `rist_logging_set_global` | |
-//! | `rist_logging_unset_global` | |
+//! | `rist_logging_set_global` | [`rist_logging_set_global`], [`rist_logging_set_or_replace_global`] |
+//! | `rist_logging_unset_global` | [`rist_logging_unset_global`], [`rist_logging_set_or_replace_global`] |
 //! | `rist_logging_settings_free` | (RIST_DEPRECATED) |
-//! | `rist_logging_settings_free2` | |
+//! | `rist_logging_settings_free2` | Not supported (Rust takes care of memory management) |
 //!
 //! ### `oob.h`
 //! | C API | Rust API |
@@ -171,6 +171,7 @@ pub mod rist_ctx;
 pub mod rist_data_block;
 pub mod rist_flow_id_create;
 pub mod rist_log_level;
+pub mod rist_logging_global;
 pub mod rist_logging_settings;
 pub mod rist_nack_type;
 pub mod rist_peer;
@@ -189,6 +190,7 @@ pub use rist_ctx::*;
 pub use rist_data_block::*;
 pub use rist_flow_id_create::*;
 pub use rist_log_level::*;
+pub use rist_logging_global::*;
 pub use rist_logging_settings::*;
 pub use rist_nack_type::*;
 pub use rist_peer::*;
@@ -229,6 +231,15 @@ pub enum PeerGetSocketError {
     InvalidSocket { socket: i32 },
 }
 
+pub enum SetGlobalLogHandlerError {
+    CallFailed { function: &'static str, code: i32 },
+    AlreadySet,
+    LockFailed,
+}
+pub enum UnsetGlobalLogHandlerError {
+    NotSetYet,
+    LockFailed,
+}
 #[derive(Debug)]
 pub struct UnknownEnumError {
     enum_type: &'static str,

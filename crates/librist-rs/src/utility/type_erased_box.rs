@@ -1,14 +1,13 @@
-pub struct TypeErasedBox<'a> {
+pub struct TypeErasedBox {
     ptr: std::ptr::NonNull<std::os::raw::c_void>,
     drop_fn: unsafe fn(std::ptr::NonNull<std::os::raw::c_void>),
-    _phantom: std::marker::PhantomData<&'a ()>,
 }
 
-unsafe impl<'a> Send for TypeErasedBox<'a> {}
-unsafe impl<'a> Sync for TypeErasedBox<'a> {}
+unsafe impl Send for TypeErasedBox {}
+unsafe impl Sync for TypeErasedBox {}
 
-impl<'a> TypeErasedBox<'a> {
-    pub fn new<T: Send + Sync + 'a>(value: T) -> Self {
+impl TypeErasedBox {
+    pub fn new<T: Send + Sync>(value: T) -> Self {
         unsafe fn drop_impl<T>(ptr: std::ptr::NonNull<std::os::raw::c_void>) {
             let _ = unsafe { Box::from_raw(ptr.as_ptr() as *mut T) };
         }
@@ -20,7 +19,6 @@ impl<'a> TypeErasedBox<'a> {
         Self {
             ptr,
             drop_fn: drop_impl::<T>,
-            _phantom: std::marker::PhantomData,
         }
     }
 
@@ -29,7 +27,7 @@ impl<'a> TypeErasedBox<'a> {
     }
 }
 
-impl<'a> Drop for TypeErasedBox<'a> {
+impl Drop for TypeErasedBox {
     fn drop(&mut self) {
         unsafe {
             (self.drop_fn)(self.ptr);
